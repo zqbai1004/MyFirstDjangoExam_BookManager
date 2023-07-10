@@ -1,0 +1,19 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}zqbai的图书管理小应用{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'books/css/bootstrap.css' %}">
+
+</head>
+<body>
+    {% block content %}{% endblock %}
+    <br><br>
+    <form action="{% url 'polls:index' %}" method="get" style="display:inline;">
+        <input type="submit" value="Goback Home">
+    </form>
+
+</body>
+</html>

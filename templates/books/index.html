@@ -1,0 +1,16 @@
+{% extends "books/base.html" %}
+
+{% block content %}
+    {% if latest_borrowed_list %}
+        <ul>
+            {% for book in latest_borrowed_list %}
+                <li>
+                    {{ book }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No books are available.</p>
+    {% endif %}
+
+{% endblock content %}
