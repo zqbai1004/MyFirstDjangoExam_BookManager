@@ -9,9 +9,10 @@
 
 </head>
 <body>
+    <h2>zqbai的图书管理小应用</h2>
     {% block content %}{% endblock %}
     <br><br>
-    <form action="{% url 'polls:index' %}" method="get" style="display:inline;">
+    <form action="{% url 'books:index' %}" method="get" style="display:inline;">
         <input type="submit" value="Goback Home">
     </form>
 
