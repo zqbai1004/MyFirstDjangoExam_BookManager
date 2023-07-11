@@ -10,6 +10,12 @@ from . import views
 app_name = 'books'
 
 urlpatterns = [
-    path('', views.IndexView.as_view(),name='index'),
-    path('detail/book/<int:pk>',views.BookDetailView.as_view(),name='bookdetail')
+    path('', views.index, name='index'),
+    path('index/',views.index,name='index'),
+    path('index/book/', views.BookIndexView.as_view(), name='book_index'),
+    path('index/student/', views.student_index, name='student_index'),
+    path('detail/book/<int:pk>',views.BookDetailView.as_view(),name='book_detail'),
+    path('search/book', views.BookSearchView.as_view(),name='book_search'),
+    path('search/student', views.student_search, name='student_search')
+
 ]

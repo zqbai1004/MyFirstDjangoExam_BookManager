@@ -1,0 +1,10 @@
+<div class="container my-4">
+    <form action="{% url 'books:book_search' %}" method="get">
+        <div class="input-group">
+            <input type="text" class="form-control" name="q" placeholder="Search by Book ID or Book Name" aria-label="Search" value={{ q }}>
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </div>
+    </form>
+</div>

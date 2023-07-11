@@ -1,0 +1,11 @@
+{% extends 'base_file/base.html' %}
+
+
+{% block content %}
+
+    {% include 'base_file/student_search_form.html' with q=search_str %}
+
+    {% include 'base_file/student_list.html' with students=student_search_results list_title='Search Results' %}
+
+
+{% endblock %}

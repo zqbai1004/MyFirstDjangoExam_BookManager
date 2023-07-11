@@ -1,0 +1,42 @@
+<div class="container">
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h4>
+                    {{ list_title }}
+                </h4>
+            </div>
+
+            <div class="card-body small" style="height:450px;overflow-y: scroll;">
+                {% if students %}
+                    <div class="row font-monospace mb-2 border-bottom">
+                        <div class="col-1"><br>Stu_ID</div>
+                        <div class="col-2"><br>Name</div>
+                        <div class="col-1"><br>Sex</div>
+                        <div class="col-2"><br>School</div>
+                        <div class="col-1"><br>Major</div>
+                        <div class="col-1"><br>Grade</div>
+                        <div class="col-1">Borrow Times</div>
+                        <div class="col-1">Latest Borrow</div>
+                        <div class="col-1">Latest Return</div>
+                    </div>
+                    {% for stdeunt  in students %}
+                    <div class="row font-monospace mb-2 small">
+                        <div class="col-1">{{ stdeunt.stu_id }}</div>
+                        <div class="col-2">{{ stdeunt.name }}</div>
+                        <div class="col-1">{{ stdeunt.sex }}</div>
+                        <div class="col-2" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis">{{ stdeunt.school.name }}</div>
+                        <div class="col-1" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis">{{ stdeunt.major }}</div>
+                        <div class="col-1">{{ stdeunt.grade }}</div>
+                        <div class="col-1">{{ stdeunt.borrow_times}}</div>
+                        <div class="col-1">{{ stdeunt.latest_borrow_date|date:"d/m/y"|default:"None"}}</div>
+                        <div class="col-1">{{ stdeunt.latest_return_date|date:"d/m/y"|default:"None"}}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="card-text">No student's data is available.</p>
+                {% endif %}
+            </div>
+
+        </div>
+</div>
+

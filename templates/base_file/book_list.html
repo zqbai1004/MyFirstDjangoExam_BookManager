@@ -1,0 +1,32 @@
+<div class="container">
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h4>
+                    {{ list_title }}
+                </h4>
+            </div>
+
+            <div class="card-body" style="height:450px;overflow-y: scroll;">
+                {% if books %}
+                    <div class="row font-monospace mb-2 fw-bold border-bottom">
+                        <div class="col-1">ID</div>
+                        <div class="col-6">Name</div>
+                        <div class="col-2">Borrow Times</div>
+                        <div class="col-3">Latest Borrow Time</div>
+                    </div>
+                    {% for book in books %}
+                    <div class="row font-monospace mb-2">
+                        <div class="col-1">{{ book.id }}</div>
+                        <div class="col-6"><a href="{% url 'books:book_detail' book.id %}">《{{ book.name }}》</a></div>
+                        <div class="col-2"> {{ book.borrow_times }}</div>
+                        <div class="col-3">{{ book.latest_borrow_date }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="card-text">No books are available.</p>
+                {% endif %}
+            </div>
+
+        </div>
+</div>
+

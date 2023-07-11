@@ -24,7 +24,7 @@ class BookCategoryAdmin(admin.ModelAdmin):
 
 class BookAdmin(admin.ModelAdmin):
     fields = ['name', 'category', 'cover_image', 'total_quantity', 'offered_by', 'pub_date']
-    list_display = ('name','cover_image','available_quantity', 'borrow_times', 'was_borrowed_recently')
+    list_display = ('name','cover_image','available_quantity', 'borrow_times', 'latest_borrow_date','was_borrowed_recently')
     inlines = [BorrowRecordsInline]
 
     search_fields = ['book_inf']
@@ -35,7 +35,7 @@ class BorrowRecordAdmin(admin.ModelAdmin):
         ('Borrow_Information', {'fields': ['student', 'book', 'borrow_date']})
     ]
     inlines = [ReturnRecordsInline]
-    list_display = ('student', 'book', 'borrow_date','isreturn')
+    list_display = ('student', 'book', 'borrow_date','isreturned')
     search_fields = ['book__name','student__name']
 
 
@@ -50,7 +50,7 @@ class ReturnRecordAdmin(admin.ModelAdmin):
 
 class StudentAdmin(admin.ModelAdmin):
     fields = ['stu_id', 'name', 'sex', 'school', 'major', 'grade']
-    list_display = ['stu_id', 'name','is_all_return','borrow_quantity']
+    list_display = ['stu_id', 'name','is_all_return_db','borrow_times','latest_borrow_date','latest_return_date']
 
 
 class SchoolAdmin(admin.ModelAdmin):
