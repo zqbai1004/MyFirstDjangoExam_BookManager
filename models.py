@@ -60,8 +60,9 @@ class Student(models.Model):
     sex = models.CharField(max_length=1, choices=GENDER_CHOICES)
     major = models.ForeignKey(Major, on_delete=models.PROTECT)
     grade = models.IntegerField(choices=YEAR_CHOICES)
-    # borrow_time = models.IntegerField(default=0,max_length=10)  这里不跟books用同一种存储方法，这里不用冗余优化
+    # borrow_time = models.IntegerField(default=0)  这里不跟books用同一种存储方法，这里不用冗余优化
     is_all_return_db = models.BooleanField(default=True) # 冗余优化
+    borrow_times_db = models.IntegerField(default=0)  #还是用冗余优化吧，太慢了
 
     def __str__(self):
         return f"{self.stu_id}-{self.name}"
@@ -71,7 +72,7 @@ class Student(models.Model):
             student=self,
             borrow_date__lte=timezone.now()
         ).count()
-    # 非冗余方法
+    # 非冗余方法,好慢好慢，
 
     def return_times(self):
         borrow_records = BorrowRecord.objects.filter(
@@ -84,7 +85,7 @@ class Student(models.Model):
         ).count()
 
     def is_all_return(self):
-        return self.return_times() == self.borrow_times()
+        return self.return_times() == self.borrow_times_db
 
     def timeout_records(self):
         if self.is_all_return():
@@ -129,6 +130,7 @@ class Student(models.Model):
             return None
 
     def save(self, *args, **kwargs):
+        self.borrow_times_db = self.borrow_times()
         self.is_all_return_db = self.is_all_return()
         super().save(*args, **kwargs)
 
@@ -164,7 +166,7 @@ class Book(models.Model):
     offered_by = models.ForeignKey(School, on_delete=models.PROTECT)
     cover_image = models.ImageField(upload_to='books/cover_images', null=True, blank=True)
     category = models.ForeignKey(BookCategory, on_delete=models.PROTECT)
-    borrow_times = models.IntegerField(default=0)  # 冗余优化
+    borrow_times_db = models.IntegerField(default=0)  # 冗余优化
 
     def __str__(self):
         return f"{self.id}-{self.name}"
@@ -198,14 +200,18 @@ class Book(models.Model):
             borrowrecord__in=borrow_records,
             return_date__lte=timezone.now()
         )
-
         return self.total_quantity - borrow_records.count() + return_records.count()
 
-    # def borrow_times(self):
-    #     return BorrowRecord.objects.filter(
-    #         book=self,
-    #         borrow_date__lte=timezone.now()
-    #     ).count()
+    def borrow_times(self):
+        return BorrowRecord.objects.filter(
+            book=self,
+            borrow_date__lte=timezone.now()
+        ).count()
+
+    def save(self, *args, **kwargs):
+        self.borrow_times_db = self.borrow_times()
+        super().save(*args, **kwargs)
+
 
 
 class BorrowRecord(models.Model):
@@ -224,14 +230,26 @@ class BorrowRecord(models.Model):
         return f"borrow：{self.student.name} - {self.book.name}"
 
     def save(self, *args, **kwargs):
-        self.book.borrow_times += 1
         self.book.save()
-        super().save(*args, **kwargs)
+        self.student.save()
+        super().save(*args,**kwargs)
 
     def delete(self, *args, **kwargs):
-        self.book.borrow_times -= 1
         self.book.save()
-        super().delete(*args, **kwargs)
+        self.student.save()
+        super().save(*args, **kwargs)
+
+
+    # def save(self, *args, **kwargs):
+    #     self.book.borrow_times += 1
+    #     self.book.save()
+    #     super().save(*args, **kwargs)
+    #
+    # def delete(self, *args, **kwargs):
+    #     self.book.borrow_times -= 1
+    #     self.book.save()
+    #     super().delete(*args, **kwargs)
+    #  这个逻辑无法成立，因为bookrecord不仅仅在创建时会使用save方法
 
 
 class ReturnRecord(models.Model):
@@ -245,6 +263,7 @@ class ReturnRecord(models.Model):
         self.borrowrecord.isreturned = True
         self.borrowrecord.save()
         super().save(*args, **kwargs)
+        # 该逻辑是可以成立的
 
     def delete(self, *args, **kwargs):
         self.borrowrecord.isreturned = False

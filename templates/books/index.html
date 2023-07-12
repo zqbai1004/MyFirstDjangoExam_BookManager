@@ -4,8 +4,9 @@
     <div class="container">
         <div class="text-center mt-5">
             <div class="d-grid gap-3 col-md-6 mx-auto">
-                <a href="{% url 'books:book_index' %}" class="btn btn-primary">按图书搜索页面</a>
-                <a href="{% url 'books:student_index' %}" class="btn btn-secondary">按学生搜索页面</a>
+                <a href="{% url 'books:book_index' %}" class="btn btn-outline-secondary">Search By Books</a>
+                <a href="{% url 'books:student_index' %}" class="btn btn-outline-primary">Search By Students</a>
             </div>
         </div>
-    </div>{% endblock content %}
+    </div>
+{% endblock content %}

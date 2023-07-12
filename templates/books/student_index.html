@@ -1,13 +1,17 @@
 {% extends "base_file/base.html" %}
 
-{% block content %}
+{% block subtitle %}
+    Studenoogle it, and you will know
+{% endblock %}
 
+{% block content %}
     {% include 'base_file/student_search_form.html' %}
 
-    {% include 'base_file/student_list.html' with students=no_all_return_student list_title="Students Who have not returned all the borrowed books" %}
+    {% include 'base_file/student_list.html' with page_param='page1' other_page_param='page2' page=page1 other_page=page2 pages=no_all_return_student_pages list_title="Students Who have not returned all the borrowed books" %}
 
-    {% include 'base_file/student_list.html' with students=all_return_student_ordered_by_borrow_time list_title="Ranked by the number of books borrowed by students" %}
+    {% include 'base_file/student_list.html' with page_param='page2' other_page_param='page1' page=page2 other_page=page1 pages=all_return_student_ordered_by_borrow_time_pages list_title="Students ranked by the number of books they have borrowed." %}
 
-
+{#我想实现两个表同时分页的功能，可能显得有些繁琐，book_index界面则没有那么繁琐#}
+{#    如果有更好方法之后再修改#}
 
 {% endblock content %}

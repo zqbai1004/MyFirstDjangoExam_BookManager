@@ -6,36 +6,63 @@
                 </h4>
             </div>
 
-            <div class="card-body small" style="height:450px;overflow-y: scroll;">
-                {% if students %}
-                    <div class="row font-monospace mb-2 border-bottom">
-                        <div class="col-1"><br>Stu_ID</div>
-                        <div class="col-2"><br>Name</div>
-                        <div class="col-1"><br>Sex</div>
-                        <div class="col-2"><br>School</div>
-                        <div class="col-1"><br>Major</div>
-                        <div class="col-1"><br>Grade</div>
-                        <div class="col-1">Borrow Times</div>
-                        <div class="col-1">Latest Borrow</div>
-                        <div class="col-1">Latest Return</div>
+            <form method="GET" class="mx-2">
+            <div class="row">
+                <div class="col-auto"><label for="pageInput{{ page_param }}" class="mt-3">Enter page number:</label></div>
+                <div class="col-2">
+                    <input id="pageInput{{ page_param }}" type="number" name="{{ page_param }}" class="form-control mt-3" min="1" max="{{ pages.paginator.num_pages }}" placeholder="Page number" required style="font-size: small" value={{ page|default:None }}>
+                </div>
+                <input type="hidden" name="{{ other_page_param }}" value="{{ other_page }}">
+                <div class="col-auto">
+                <button type="submit" class="btn btn-outline-secondary mt-3" style="font-size: small">Go</button>
+                </div>
+                {% if pages.has_previous %}
+                    <div class="col-auto ms-auto">
+                        <a style="font-size: small" href="?{{ page_param }}={{ pages.previous_page_number }}&{{ other_page_param }}={{ other_page }}" class="btn btn-outline-secondary mt-3 {% if not pages.has_previous %}disabled{% endif %}">Previous Page</a>
                     </div>
-                    {% for stdeunt  in students %}
+                {% endif %}
+{#            这里对最右的格式设置不太一样#}
+            </div>
+            </form>
+
+
+            <div class="card-body small" style="height:450px;overflow-y: scroll;">
+                {% if pages %}
+                    <div class="row mb-2 border-bottom fw-bold">
+                        <div class="col-1">Stu_ID</div>
+                        <div class="col-2">Name</div>
+                        <div class="col-1">Sex</div>
+                        <div class="col-2">School</div>
+                        <div class="col-2">Major</div>
+                        <div class="col-1">Grade</div>
+                        <div class="col-1">B. Times</div>
+                        <div class="col-1">Latest B.</div>
+                        <div class="col-1">Latest R.</div>
+                    </div>
+                    {% for student in pages %}
                     <div class="row font-monospace mb-2 small">
-                        <div class="col-1">{{ stdeunt.stu_id }}</div>
-                        <div class="col-2">{{ stdeunt.name }}</div>
-                        <div class="col-1">{{ stdeunt.sex }}</div>
-                        <div class="col-2" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis">{{ stdeunt.school.name }}</div>
-                        <div class="col-1" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis">{{ stdeunt.major }}</div>
-                        <div class="col-1">{{ stdeunt.grade }}</div>
-                        <div class="col-1">{{ stdeunt.borrow_times}}</div>
-                        <div class="col-1">{{ stdeunt.latest_borrow_date|date:"d/m/y"|default:"None"}}</div>
-                        <div class="col-1">{{ stdeunt.latest_return_date|date:"d/m/y"|default:"None"}}</div>
+                        <div class="col-1"><a href="{% url 'books:student_detail' student.id %}">{{ student.stu_id }}</a></div>
+                        <div class="col-2">{{ student.name }}</div>
+                        <div class="col-1">{{ student.sex }}</div>
+                        <div class="col-2" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis">{{ student.school.name }}</div>
+                        <div class="col-2" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis">{{ student.major }}</div>
+                        <div class="col-1">{{ student.grade }}</div>
+                        <div class="col-1">{{ student.borrow_times}}</div>
+                        <div class="col-1">{{ student.latest_borrow_date|date:"y-m-d"|default:"None"}}</div>
+                        <div class="col-1">{{ student.latest_return_date|date:"y-m-d"|default:"None"}}</div>
                     </div>
                     {% endfor %}
                 {% else %}
                     <p class="card-text">No student's data is available.</p>
                 {% endif %}
+            {% if pages.has_next %}
+            <div class="d-flex justify-content-end">
+                <a style="font-size: small" href="?{{ page_param }}={{ pages.next_page_number }}&{{ other_page_param }}={{ other_page }}" class="btn btn-outline-secondary mt-3 {% if not pages.has_next %}disabled{% endif %}">Next Page</a>
+{#            Django没提供Load more功能#}
             </div>
+            {% endif %}
+            </div>=
+
 
         </div>
 </div>

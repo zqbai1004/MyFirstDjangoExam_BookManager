@@ -6,20 +6,24 @@
                 </h4>
             </div>
 
-            <div class="card-body" style="height:450px;overflow-y: scroll;">
+            <div class="card-body small" style="height:450px;overflow-y: scroll;">
                 {% if books %}
-                    <div class="row font-monospace mb-2 fw-bold border-bottom">
+                    <div class="row mb-2 fw-bold border-bottom">
                         <div class="col-1">ID</div>
-                        <div class="col-6">Name</div>
-                        <div class="col-2">Borrow Times</div>
-                        <div class="col-3">Latest Borrow Time</div>
+                        <div class="col-5">Name</div>
+                        <div class="col-2">Category</div>
+                        <div class="col-1">B.Times</div>
+                        <div class="col-1">Quantity</div>
+                        <div class="col-1">Latest B.</div>
                     </div>
                     {% for book in books %}
-                    <div class="row font-monospace mb-2">
-                        <div class="col-1">{{ book.id }}</div>
-                        <div class="col-6"><a href="{% url 'books:book_detail' book.id %}">《{{ book.name }}》</a></div>
-                        <div class="col-2"> {{ book.borrow_times }}</div>
-                        <div class="col-3">{{ book.latest_borrow_date }}</div>
+                    <div class="row font-monospace mb-2 small">
+                        <div class="col-1"><a href="{% url 'books:book_detail' book.id %}">{{ book.id }}</a></div>
+                        <div class="col-5">《{{ book.name }}》</div>
+                        <div class="col-2">{{ book.category }}</div>
+                        <div class="col-1">{{ book.borrow_times_db }}</div>
+                        <div class="col-1"> {{ book.available_quantity|stringformat:"02d" }}/{{ book.total_quantity|stringformat:"02d" }}</div>
+                        <div class="col-1">{{ book.latest_borrow_date|date:"y-m-d"|default:"None"}}</div>
                     </div>
                     {% endfor %}
                 {% else %}
