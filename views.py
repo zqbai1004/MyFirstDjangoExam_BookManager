@@ -1,13 +1,12 @@
-from django.shortcuts import render
-
 # Create your views here.
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect,Http404
 from django.db.models import Q
 from django.views import generic
 from django.core.paginator import Paginator
+from django.contrib import messages
 
 from .models import *
 
@@ -123,7 +122,7 @@ class BookDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stu_inf = self.request.GET.get('stu_inf','')
+        stu_inf = self.request.GET.get('stu_inf', '')
         no_results = not Student.objects.filter(
             stu_id=stu_inf
         ).exists() if stu_inf else True
@@ -143,9 +142,41 @@ class BookDetailView(generic.DetailView):
         context['can_return'] = can_return
 
         return context
-def run(request,book_id,student_id):
-    return HttpResponse('')
+
+
+def run(request, book_id, student_id):
+    if request.POST['b_or_r'] == '1':
+        new_borrow_record = BorrowRecord(book=get_object_or_404(Book, id=book_id),
+                                         student=get_object_or_404(Student, stu_id=student_id),
+                                         borrow_date=timezone.now())
+        new_borrow_record.save()
+    elif request.POST['b_or_r'] == '2':
+        related_borrow_record = BorrowRecord.objects.filter(
+                                                            student__stu_id=student_id,
+                                                            book_id=book_id,
+                                                            borrow_date__lte=timezone.now()
+                                                            )
+        if not related_borrow_record.exists():
+            return Http404
+        related_borrow_record = related_borrow_record.order_by('borrow_date').first()
+        # 选最早借的还
+        new_return_record = ReturnRecord(
+            borrowrecord=related_borrow_record,
+            return_date=timezone.now()
+        )
+        new_return_record.save()
+    else:
+        return Http404
+    messages.success(request, 'Operation successful!')
+    # 成功弹窗还是要用Javascript做？这个好像直接被覆盖掉了
+    return
+
+
+def book_run(request, book_id, student_id):
+    run(request, book_id, student_id)
+    return HttpResponseRedirect(reverse('books:book_detail', args=(book_id,)) + "?stu_inf=" + str(student_id))
+
 
 def stu_run(request, book_id, student_id):
-    return HttpResponse('')
-
+    run(request, book_id, student_id)
+    return HttpResponse(reverse('books:student_detail', args=(student_id,)))

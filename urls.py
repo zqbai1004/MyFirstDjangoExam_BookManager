@@ -18,6 +18,7 @@ urlpatterns = [
     path('detail/student/<int:pk>', views.student_detail, name="student_detail"),
     path('search/book', views.BookSearchView.as_view(), name='book_search'),
     path('search/student', views.student_search, name='student_search'),
-    path('run',views.run,name='management_run')
+    path('run/book/<int:book_id>/<int:student_id>', views.book_run, name='book_run'),
+    path('run/student/<int:book_id>/<int:student_id>',views.stu_run, name='student_run')
 
 ]

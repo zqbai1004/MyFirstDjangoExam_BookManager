@@ -230,9 +230,9 @@ class BorrowRecord(models.Model):
         return f"borrow：{self.student.name} - {self.book.name}"
 
     def save(self, *args, **kwargs):
+        super().save(*args,**kwargs)
         self.book.save()
         self.student.save()
-        super().save(*args,**kwargs)
 
     def delete(self, *args, **kwargs):
         self.book.save()

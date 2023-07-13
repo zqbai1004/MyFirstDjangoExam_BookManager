@@ -24,7 +24,7 @@ class BookCategoryAdmin(admin.ModelAdmin):
 
 class BookAdmin(admin.ModelAdmin):
     fields = ['name', 'category', 'cover_image', 'total_quantity', 'offered_by', 'pub_date']
-    list_display = ('name','cover_image','available_quantity', 'borrow_times', 'latest_borrow_date','was_borrowed_recently')
+    list_display = ('name','cover_image','available_quantity', 'borrow_times_db', 'latest_borrow_date','was_borrowed_recently')
     inlines = [BorrowRecordsInline]
 
     search_fields = ['book_inf']
