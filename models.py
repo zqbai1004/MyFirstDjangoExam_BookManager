@@ -87,7 +87,7 @@ class Student(models.Model):
     def is_all_return(self):
         return self.return_times() == self.borrow_times_db
 
-    def timeout_records(self):
+    def notreturn_records(self):
         if self.is_all_return():
             return None
         else:
@@ -103,10 +103,17 @@ class Student(models.Model):
             # 归还的记录
             not_return_records = borrow_records.exclude(
                 id__in=return_records.values_list('borrowrecord_id', flat=True)
-            )
+            ).order_by('borrow_date')
             # 借走中未归还的记录
 
-            return not_return_records.order_by('borrow_date')
+            return not_return_records
+    def time_out_records(self):
+        if self.notreturn_records():
+            return self.notreturn_records().filter(
+                borrow_date__lte=TIMEOUTLIMIT
+            )
+        else:
+            return None
 
     def latest_borrow_date(self):
         latest_borrow_record = BorrowRecord.objects.filter(
@@ -235,9 +242,9 @@ class BorrowRecord(models.Model):
         self.student.save()
 
     def delete(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         self.book.save()
         self.student.save()
-        super().save(*args, **kwargs)
 
 
     # def save(self, *args, **kwargs):
@@ -260,12 +267,12 @@ class ReturnRecord(models.Model):
         return f"return:{self.borrowrecord.student.name}-{self.borrowrecord.book.name}"
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         self.borrowrecord.isreturned = True
         self.borrowrecord.save()
-        super().save(*args, **kwargs)
         # 该逻辑是可以成立的
 
     def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
         self.borrowrecord.isreturned = False
         self.borrowrecord.save()
-        super().delete(*args, **kwargs)

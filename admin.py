@@ -43,14 +43,14 @@ class BorrowRecordAdmin(admin.ModelAdmin):
 
 class ReturnRecordAdmin(admin.ModelAdmin):
     fieldsets = [
-        ('Return_Information',{'fields': ['borrowrecord__student__name', 'borrowrecord__book', 'borrowrecord__borrow_date']})
+        ('Return_Information',{'fields': ['borrowrecord', 'return_date']})
     ]
-    search_fields = ['borrowrecord__book__name','borrowrecord__student__name']
+    list_display = ['borrowrecord','return_date']
 
 
 class StudentAdmin(admin.ModelAdmin):
     fields = ['stu_id', 'name', 'sex', 'school', 'major', 'grade']
-    list_display = ['stu_id', 'name','is_all_return_db','borrow_times','latest_borrow_date','latest_return_date']
+    list_display = ['stu_id', 'name','is_all_return_db','borrow_times_db','return_times','latest_borrow_date','latest_return_date']
 
 
 class SchoolAdmin(admin.ModelAdmin):
@@ -64,7 +64,7 @@ class MajorAdmin(admin.ModelAdmin):
 
 admin.site.register(Book, BookAdmin)
 admin.site.register(BorrowRecord, BorrowRecordAdmin)
-admin.site.register(ReturnRecord)
+admin.site.register(ReturnRecord,ReturnRecordAdmin)
 admin.site.register(BookCategory,BookCategoryAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(School, SchoolAdmin)

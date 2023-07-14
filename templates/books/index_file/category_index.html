@@ -1,0 +1,37 @@
+{% extends "books/base_file/base.html" %}
+
+{% block subtitle %}
+    Categorooogle
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h4>
+                    Category List
+                </h4>
+            </div>
+
+            <div class="card-body">
+                {% if categories %}
+                    <div class="row mb-2 fw-bold border-bottom">
+                        <div class="col-2">ID</div>
+                        <div class="col-5">Category</div>
+                    </div>
+                    {% for category in categories %}
+                    <div class="row font-monospace mb-2 small">
+                        <div class="col-2">{{ category.id }}</div>
+                        <div class="col-5"><a href="{% url 'books:category_detail' category.id %}" class="text-black text-decoration-none">{{ category.name }}</a></div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="card-text">No Categories are available.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock content %}

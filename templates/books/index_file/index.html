@@ -1,4 +1,4 @@
-{% extends "base_file/base.html" %}
+{% extends "books/base_file/base.html" %}
 
 {% block content %}
     <div class="container">
@@ -6,6 +6,10 @@
             <div class="d-grid gap-3 col-md-6 mx-auto">
                 <a href="{% url 'books:book_index' %}" class="btn btn-outline-secondary">Search By Books</a>
                 <a href="{% url 'books:student_index' %}" class="btn btn-outline-primary">Search By Students</a>
+                <a href="{% url 'books:school_index' %}" class="btn btn-outline-danger">Search By Schools</a>
+                <a href="{% url 'books:major_index' %}" class="btn btn-outline-success">Search By Majors</a>
+                <a href="{% url 'books:category_index' %}" class="btn btn-outline-warning">Search By Categories</a>
+
             </div>
         </div>
     </div>

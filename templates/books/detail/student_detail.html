@@ -1,0 +1,109 @@
+{% extends "books/base_file/base.html" %}
+
+{% block subtitle %}
+    Do Your Book Management
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card mt-4">
+        <div class="card-body">
+        <div class="row mb-2 fw-bold border-bottom">
+            <div class="col-1">Stu_ID</div>
+            <div class="col-2">Name</div>
+            <div class="col-1">Sex</div>
+            <div class="col-2">School</div>
+            <div class="col-2">Major</div>
+            <div class="col-1">Grade</div>
+            <div class="col-1">B. Times</div>
+            <div class="col-1">Latest B.</div>
+            <div class="col-1">Latest R.</div>
+        </div>
+        <div class="row font-monospace">
+            <div class="col-1"><a href="{% url 'books:student_detail' student.id %}">{{ student.stu_id }}</a></div>
+            <div class="col-2">{{ student.name }}</div>
+            <div class="col-1">{{ student.sex }}</div>
+            <div class="col-2" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis">{{ student.school.name }}</div>
+            <div class="col-2" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis">{{ student.major }}</div>
+            <div class="col-1">{{ student.grade }}</div>
+            <div class="col-1">{{ student.borrow_times}}</div>
+            <div class="col-1">{{ student.latest_borrow_date|date:"y-m-d"|default:"None"}}</div>
+            <div class="col-1">{{ student.latest_return_date|date:"y-m-d"|default:"None"}}</div>
+            </div>
+        </div>
+    </div>
+
+{% if not student.is_all_return_db %}
+    <div class="card mt-4">
+        <div class="card-header bg-secondary text-white">
+            <h6>List of Unreturned Records</h6>
+        </div>
+        <div class="card-body">
+            <div class="row mb-2 fw-bold border-bottom">
+                <div class="col-1">Book ID</div>
+                <div class="col-5">Book Name</div>
+                <div class="col-2">Borrow Time</div>
+            </div>
+            {% for timeout_record in timeout_records %}
+            <div class="row mb-2 fw-bold border-bottom text-warning">
+                <div class="col-1">{{ timeout_record.book.id }}</div>
+                <div class="col-5">{{ timeout_record.book.name}}</div>
+                <div class="col-2">{{ timeout_record.borrow_date}}</div>
+            </div>
+            {% endfor %}
+            {% for notreturn_record in notreturn_records %}
+            {% if notreturn_record not in timeout_records %}
+             <div class="row mb-2 fw-bold border-bottom">
+                <div class="col-1">{{ notreturn_record.book.id }}</div>
+                <div class="col-5">{{ notreturn_record.book.name}}</div>
+                <div class="col-2">{{ notreturn_record.borrow_date|date:"y-m-d"}}</div>
+                <div class="col-auto">
+                    <form action="{% url 'books:student_run' notreturn_record.book.id student.stu_id  %}" method="post">
+                    {% csrf_token %}
+                        <input type="hidden" name="b_or_r" value="2">
+                        <button type="submit" class="btn btn-outline-secondary small">return</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<form method="get" class="mx-2">
+    <div class="row">
+    <div class="col-auto">
+        <div class="mt-3 d-flex align-items-center">
+            <label for="book_inf" class="me-3 col-auto">Enter Book ID or name</label>
+            <input id="book_inf" type="text" name="book_inf" class="form-control" placeholder="Book ID" required value="{{ book_inf}}">
+        </div>
+    </div>
+    <div class="col-auto"><button type="submit" class="btn btn-outline-secondary mt-3">Confirm</button></div>
+    </div>
+</form>
+
+{% if not book and book_inf %}
+    <div class="justify-content-start alert alert-secondary" role="alert">
+        There is no Book with this ID in the database. Please change an input
+    </div>
+{% elif book%}
+    <div class="card">
+    <div class="card-header bg-secondary text-white">
+        <h5>Please check the book you chose.</h5>
+    </div>
+    <div class="card-body">
+    <form action="{% url 'books:student_run' book.id student.id %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="b_or_r" value="1">
+    <div class="row"><div class="col-auto">id:{{ book.id }}《{{ book.name }}》</div></div>
+    <div class="row"><div class="col-auto">
+        <button type="submit" class="btn btn-outline-secondary" {% if not book.available_quantity %}disabled{% endif %}>Borrow</button>
+        </div></div>
+    </form>
+    </div>
+{% endif %}
+
+
+</div>
+{% endblock content %}

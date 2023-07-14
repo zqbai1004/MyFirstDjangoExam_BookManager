@@ -1,0 +1,39 @@
+{% extends "books/base_file/base.html" %}
+
+{% block subtitle %}
+    Schoooooogle
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h4>
+                    School List
+                </h4>
+            </div>
+
+            <div class="card-body">
+                {% if schools %}
+                    <div class="row mb-2 fw-bold border-bottom">
+                        <div class="col-1">ID</div>
+                        <div class="col-5">Name</div>
+                        <div class="col-5">Location</div>
+                    </div>
+                    {% for school in schools %}
+                    <div class="row font-monospace mb-2 small">
+                        <div class="col-1">{{ school.id }}</div>
+                        <div class="col-5"><a href="{% url 'books:school_detail' school.id %} " class="text-decoration-none text-black">《{{ school.name }}》</a></div>
+                        <div class="col-5">{{ school.location }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="card-text">No School are available.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock content %}

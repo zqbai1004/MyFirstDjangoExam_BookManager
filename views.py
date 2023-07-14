@@ -2,7 +2,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
-from django.http import HttpResponse, HttpResponseRedirect,Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.db.models import Q
 from django.views import generic
 from django.core.paginator import Paginator
@@ -12,7 +12,34 @@ from .models import *
 
 
 def index(request):
-    return render(request, 'books/index.html')
+    return render(request, 'books/index_file/index.html')
+
+
+def school_index(request):
+    schools = School.objects.all()
+    return render(request, 'books/index_file/school_index.html', {'schools': schools})
+
+
+def major_index(request):
+    majors = Major.objects.all()
+    return render(request, 'books/index_file/major_index.html', {'majors': majors})
+
+
+def category_index(request):
+    categories = BookCategory.objects.all()
+    return render(request, 'books/index_file/category_index.html', {'categories': categories})
+
+def school_detail(request, pk):
+    school = get_object_or_404(School, pk=pk)
+    return render(request,'books/detail/school_detail.html',{'school': school})
+
+def major_detail(request, pk):
+    major = get_object_or_404(Major, pk=pk)
+    return render(request,'books/detail/major_detail.html',{'major': major})
+
+def category_detail(request, pk):
+    category = get_object_or_404(BookCategory, pk=pk)
+    return render(request,'books/detail/category_detail.html',{'category': category})
 
 
 # def book_search(request):
@@ -30,7 +57,8 @@ def index(request):
 
 def student_index(request):
     all_student = Student.objects.all()
-    no_all_return_student = Student.objects.filter(is_all_return_db=False)  # 冗余优化后的筛选，底层用SQL实现
+    no_all_return_student = Student.objects.filter(is_all_return_db=False).order_by(
+        '-borrow_times_db')  # 冗余优化后的筛选，底层用SQL实现
     all_return_student = Student.objects.filter(is_all_return_db=True)
     all_return_student_ordered_by_borrow_time = Student.objects.filter(
         is_all_return_db=True
@@ -50,7 +78,7 @@ def student_index(request):
                'page2': page2
                }
 
-    return render(request, 'books/student_index.html', context)
+    return render(request, 'books/index_file/student_index.html', context)
 
 
 def student_search(request):
@@ -68,19 +96,27 @@ def student_search(request):
 
 def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
-    book_inf = request.GET('book_inf')
+    book_inf = request.GET.get('book_inf', '')
+    if book_inf == "":
+        book = None
+    else:
+        book = Book.objects.filter(id=book_inf).first()
 
-    no_results = not Book.objects.filter(
-        id=book_inf
-    ).exists()
-    context = {'student': student, 'no_results': no_results}
+    can_borrow = None
 
-    return render(request, 'books/student_detail.html', context)
+    context = {'student': student,
+               'book': book,
+               'notreturn_records': student.notreturn_records(),
+               'timeout_records': student.time_out_records(),
+               'book_inf': book_inf
+               }
+
+    return render(request, 'books/detail/student_detail.html', context)
 
 
 class BookIndexView(generic.ListView):
     model = Book
-    template_name = 'books/book_index.html'
+    template_name = 'books/index_file/book_index.html'
     context_object_name = 'most_borrow_list'
 
     def get_queryset(self):
@@ -118,27 +154,22 @@ class BookSearchView(generic.ListView):
 
 class BookDetailView(generic.DetailView):
     model = Book
-    template_name = 'books/book_detail.html'
+    template_name = 'books/detail/book_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         stu_inf = self.request.GET.get('stu_inf', '')
-        no_results = not Student.objects.filter(
-            stu_id=stu_inf
-        ).exists() if stu_inf else True
-        context['no_results'] = no_results
+        student = Student.objects.filter(stu_id=stu_inf).first()
+        context['student'] = student
         context['stu_inf'] = stu_inf
-        can_borrow = None
         can_return = None
-        if not no_results:
-            can_borrow = self.object.available_quantity()
+        if student:
             can_return = BorrowRecord.objects.filter(
                 borrow_date__lte=timezone.now(),
                 book=self.object,
                 isreturned=False,
                 student__stu_id=stu_inf
             ).exists()
-        context['can_borrow'] = can_borrow
         context['can_return'] = can_return
 
         return context
@@ -152,10 +183,11 @@ def run(request, book_id, student_id):
         new_borrow_record.save()
     elif request.POST['b_or_r'] == '2':
         related_borrow_record = BorrowRecord.objects.filter(
-                                                            student__stu_id=student_id,
-                                                            book_id=book_id,
-                                                            borrow_date__lte=timezone.now()
-                                                            )
+            student__stu_id=student_id,
+            book_id=book_id,
+            borrow_date__lte=timezone.now(),
+            isreturned=False
+        )
         if not related_borrow_record.exists():
             return Http404
         related_borrow_record = related_borrow_record.order_by('borrow_date').first()
@@ -179,4 +211,5 @@ def book_run(request, book_id, student_id):
 
 def stu_run(request, book_id, student_id):
     run(request, book_id, student_id)
-    return HttpResponse(reverse('books:student_detail', args=(student_id,)))
+    return HttpResponseRedirect(
+        reverse('books:student_detail', args=(get_object_or_404(Student, stu_id=student_id).id,)))

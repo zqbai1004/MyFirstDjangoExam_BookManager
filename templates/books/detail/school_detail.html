@@ -1,0 +1,75 @@
+{% extends "books/base_file/base.html" %}
+{#这里的列表其实也可以引用student.index、book.index的模版，但是就是想多写#}
+{% block subtitle %}
+    Tap and Request
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h4>
+                    Students from {{ school.name }}
+                </h4>
+            </div>
+
+            <div class="card-body" style="height:450px;overflow-y: scroll;">
+                {% if school.student_set.all %}
+                    <div class="row mb-2 fw-bold border-bottom">
+                        <div class="col-2">ID</div>
+                        <div class="col-3">Name</div>
+                        <div class="col-1">Sex</div>
+                        <div class="col-1">Grade</div>
+                        <div class="col-3">Major</div>
+                    </div>
+                    {% for student in school.student_set.all %}
+                    <div class="row font-monospace mb-2 small">
+                        <div class="col-2">{{ student.stu_id }}</div>
+                        <div class="col-3"><a href="{% url 'books:student_detail' student.id %}" class="text-decoration-none text-black"> {{ student.name }}</a></div>
+                        <div class="col-1">{{ student.sex }}</div>
+                        <div class="col-1">{{ student.grade }}</div>
+                        <div class="col-3"><a href="{% url 'books:major_detail' student.major.id %}" class="text-decoration-none text-black">{{ student.major }}</a></div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="card-text"> No Student are available.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h4>
+                    Books provided by {{ school.name }}
+                </h4>
+            </div>
+
+            <div class="card-body" style="height:450px;overflow-y: scroll;">
+                {% if school.book_set.all %}
+                    <div class="row mb-2 fw-bold border-bottom">
+                        <div class="col-2">ID</div>
+                        <div class="col-5">Name</div>
+                        <div class="col-3">Category</div>
+                        <div class="col-1">Quantity</div>
+                    </div>
+                    {% for book in school.book_set.all %}
+                    <div class="row font-monospace mb-2 small">
+                        <div class="col-2">{{ book.id }}</div>
+                        <div class="col-5"><a href="{% url 'books:book_detail' book.id %}" class="text-decoration-none text-black"> {{ book.name }}</a></div>
+                        <div class="col-3"><a href="{% url 'books:category_detail' book.category.id %}" class="text-black text-decoration-none"> {{ book.category }}</a></div>
+                        <div class="col-1">{{ book.available_quantity|stringformat:"02d" }}/{{ book.total_quantity|stringformat:"02d" }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="card-text">No Student are available.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock content %}

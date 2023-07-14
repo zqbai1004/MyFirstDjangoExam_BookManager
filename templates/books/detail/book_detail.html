@@ -1,4 +1,4 @@
-{% extends "base_file/base.html" %}
+{% extends "books/base_file/base.html" %}
 
 {% block subtitle %}
     Do Your Book Management
@@ -7,7 +7,7 @@
 {% block content %}
 <div class="container">
     <div class="card mt-4">
-        <div class="card-body small">
+        <div class="card-body">
         <div class="row mb-2 fw-bold border-bottom">
             <div class="col-1">ID</div>
             <div class="col-5">Name</div>
@@ -32,30 +32,31 @@
         <div class="col-auto">
             <div class="mt-3 d-flex align-items-center">
                 <label for="stu_Input" class="me-3 col-auto">Enter student ID or name</label>
-                <input id="stu_Input" type="text" name="stu_inf" class="form-control" placeholder="Student ID or Name" required value="{{ stu_inf}}">
+                <input id="stu_Input" type="text" name="stu_inf" class="form-control" placeholder="Student ID" required value="{{ stu_inf}}">
+{#                Django内置没有补全功能，因此只能硬输入#}
             </div>
         </div>
         <div class="col-auto"><button type="submit" class="btn btn-outline-secondary mt-3">Confirm</button></div>
         </div>
     </form>
 
-    {% if no_results %}
+    {% if not student and stu_inf%}
     <div class="justify-content-start alert alert-secondary" role="alert">
         There is no student with this ID in the database. Please register first.
     </div>
-    {% else %}
+    {% elif student %}
         <div class="card">
         <div class="card-header bg-secondary text-white">
             <h5>Please choose to borrow or return this book.</h5>
         </div>
         <div class="card-body">
-        <form action="{% url 'books:book_run' book.id stu_inf %}" method="post">
+        <form action="{% url 'books:book_run' book.id student.stu_id %}" method="post">
         {% csrf_token %}
         <div class="row">
             <div class="col-auto">
-            <input class="form-check-input" type="radio" name="b_or_r" id="b" value=1 {% if not can_borrow %}disabled{% endif %}>
+            <input class="form-check-input" type="radio" name="b_or_r" id="b" value=1 {% if not book.available_quantity %}disabled{% endif %}>
             <label class="form-check-label fw-bold" for="b">Borrow
-                {% if not can_borrow %}
+                {% if not book.available_quantity %}
                     <div class="alert alert-secondary" role="alert">
                         This book is currently checked out and not available for borrowing.
                     </div>
@@ -64,7 +65,7 @@
             <br>
             <input type="radio" class="form-check-input" name="b_or_r" id="r" value=2 {% if not can_return %}disabled{% endif %}>
             <label class="form-check-label fw-bold" for="r">Return
-                {% if not can_borrow %}
+                {% if not can_return %}
                     <div class="alert alert-secondary" role="alert">
                         This student does not have a borrow record for this book and cannot return it.
                     </div>
@@ -72,7 +73,7 @@
             </label>
             </div>
             <div class="col-auto">
-            <button type="submit" class="btn btn-outline-secondary" {% if not can_return and not can_borrow %}disabled{% endif %}>Submit</button>
+            <button type="submit" class="btn btn-outline-secondary" {% if not can_return and not book.available_quantity %}disabled{% endif %}>Submit</button>
             </div>
         </div>
         </form>

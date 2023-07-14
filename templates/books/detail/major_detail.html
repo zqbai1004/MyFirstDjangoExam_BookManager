@@ -1,0 +1,43 @@
+{% extends "books/base_file/base.html" %}
+
+{#这里的列表其实也可以引用student.index的模版，但是就是想多写#}
+
+{% block subtitle %}
+    Tap and Request
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h4>
+                    Students Major in {{ major.name }}
+                </h4>
+            </div>
+
+            <div class="card-body">
+                {% if major.student_set.all %}
+                    <div class="row mb-2 fw-bold border-bottom">
+                        <div class="col-1">ID</div>
+                        <div class="col-3">Name</div>
+                        <div class="col-1">Sex</div>
+                        <div class="col-1">Grade</div>
+                        <div class="col-5">School</div>
+                    </div>
+                    {% for student in major.student_set.all %}
+                    <div class="row font-monospace mb-2 small">
+                        <div class="col-1">{{ student.stu_id }}</div>
+                        <div class="col-3"><a href="{% url 'books:student_detail' student.id %}" class="text-decoration-none text-black"> {{ student.name }}</a></div>
+                        <div class="col-1">{{ student.sex }}</div>
+                        <div class="col-1">{{ student.grade }}</div>
+                        <div class="col-5"><a href="{% url 'books:school_detail' student.school.id %}" class="text-decoration-none text-black">{{ student.school }}</a></div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="card-text"> No Students are available.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

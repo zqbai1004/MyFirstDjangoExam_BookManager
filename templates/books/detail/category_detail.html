@@ -1,0 +1,39 @@
+{% extends "books/base_file/base.html" %}
+
+{#这里的列表其实也可以引用book.index的模版，但是就是想多写#}
+
+{% block subtitle %}
+    Tap and Request
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h4>
+                    {{ category.name}} Books
+                </h4>
+            </div>
+
+            <div class="card-body">
+                {% if category.book_set.all %}
+                    <div class="row mb-2 fw-bold border-bottom">
+                        <div class="col-1">ID</div>
+                        <div class="col-5">Name</div>
+                        <div class="col-5">Provided School</div>
+                    </div>
+                    {% for book in category.book_set.all %}
+                    <div class="row font-monospace mb-2 small">
+                        <div class="col-1">{{ book.id }}</div>
+                        <div class="col-5"><a href="{% url 'books:book_detail' book.id %}" class="text-decoration-none text-black"> {{ book.name }}</a></div>
+                        <div class="col-5"><a href="{% url 'books:school_detail' book.offered_by.id %}" class="text-decoration-none text-black">{{ book.offered_by.name }}</a></div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="card-text"> No Books are available.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

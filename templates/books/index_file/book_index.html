@@ -1,0 +1,17 @@
+{% extends "books/base_file/base.html" %}
+
+{% block subtitle %}
+    Bookoogle it, and you will know
+{% endblock %}
+
+{% block content %}
+
+    {% include 'books/base_file/book_search_form.html' %}
+
+    {% include 'books/base_file/book_list.html' with books=most_borrow_list list_title="Ranked by the number of books borrowed" %}
+
+    {% include 'books/base_file/book_list.html' with books=all_books list_title="Ranked by the id of books" %}
+
+
+
+{% endblock content %}

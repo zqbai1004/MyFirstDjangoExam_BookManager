@@ -26,14 +26,14 @@
             </form>
 
 
-            <div class="card-body small" style="height:450px;overflow-y: scroll;">
+            <div class="card-body" style="height:450px;overflow-y: scroll;">
                 {% if pages %}
                     <div class="row mb-2 border-bottom fw-bold">
                         <div class="col-1">Stu_ID</div>
                         <div class="col-2">Name</div>
                         <div class="col-1">Sex</div>
-                        <div class="col-2">School</div>
-                        <div class="col-2">Major</div>
+                        <div class="col-2"><a href="{% url 'books:school_index' %}" class="text-decoration-none text-black">School</a></div>
+                        <div class="col-2"><a href="{% url 'books:major_index' %}" class="text-black text-decoration-none">Major</a></div>
                         <div class="col-1">Grade</div>
                         <div class="col-1">B. Times</div>
                         <div class="col-1">Latest B.</div>
@@ -42,10 +42,10 @@
                     {% for student in pages %}
                     <div class="row font-monospace mb-2 small">
                         <div class="col-1"><a href="{% url 'books:student_detail' student.id %}">{{ student.stu_id }}</a></div>
-                        <div class="col-2">{{ student.name }}</div>
+                        <div class="col-2"><a href="{% url 'books:student_detail' student.id %}" class="text-decoration-none text-black">{{ student.name }}</a></div>
                         <div class="col-1">{{ student.sex }}</div>
-                        <div class="col-2" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis">{{ student.school.name }}</div>
-                        <div class="col-2" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis">{{ student.major }}</div>
+                        <div class="col-2" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis"><a href="{% url 'books:school_detail' student.school.id %}" class="text-black text-decoration-none">{{ student.school.name }}</a> </div>
+                        <div class="col-2" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis"><a href="{% url 'books:major_detail' student.major.id %}" class="text-decoration-none text-black"> {{ student.major }} </a></div>
                         <div class="col-1">{{ student.grade }}</div>
                         <div class="col-1">{{ student.borrow_times}}</div>
                         <div class="col-1">{{ student.latest_borrow_date|date:"y-m-d"|default:"None"}}</div>
@@ -61,7 +61,7 @@
 {#            Django没提供Load more功能#}
             </div>
             {% endif %}
-            </div>=
+            </div>
 
 
         </div>
