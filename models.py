@@ -72,8 +72,9 @@ class Student(models.Model):
             student=self,
             borrow_date__lte=timezone.now()
         ).count()
-    # 非冗余方法,好慢好慢，
 
+    # 非冗余方法,好慢好慢，
+    @property
     def return_times(self):
         borrow_records = BorrowRecord.objects.filter(
             student=self,
@@ -85,8 +86,8 @@ class Student(models.Model):
         ).count()
 
     def is_all_return(self):
-        return self.return_times() == self.borrow_times_db
-
+        return self.return_times == self.borrow_times_db
+    @property
     def notreturn_records(self):
         if self.is_all_return():
             return None
@@ -167,7 +168,7 @@ class BookCategory(models.Model):
 
 
 class Book(models.Model):
-    name = models.CharField(max_length=200, null=False, blank=False)
+    name = models.CharField(max_length=200, null=True, blank=True)
     pub_date = models.DateTimeField('data published')
     total_quantity = models.IntegerField(default=1, null=False)
     offered_by = models.ForeignKey(School, on_delete=models.PROTECT)
@@ -198,6 +199,7 @@ class Book(models.Model):
 
         return recent_borrow_records.exists()
 
+    @property
     def available_quantity(self):
         borrow_records = BorrowRecord.objects.filter(
             book=self,
@@ -237,6 +239,8 @@ class BorrowRecord(models.Model):
         return f"borrow：{self.student.name} - {self.book.name}"
 
     def save(self, *args, **kwargs):
+        if self.book.available_quantity <= 0:
+            raise ValueError('The available quantity of this book is 0，no borrow allowed now')
         super().save(*args,**kwargs)
         self.book.save()
         self.student.save()
